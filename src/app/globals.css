@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-scan {
+  animation: scan 3s ease-in-out infinite;
+}
+
+/* Complex Loader Styles */
+.loader-outer {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  margin: -175px 0 0 -175px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #4db8ff;
+  border-bottom-color: #b3e0ff;
+  border-right-color: #66c2ff;
+  border-left-color: #80ccff;
+  box-shadow: 0 0 15px #2187e7;
+  animation: spin 30s linear infinite;
+}
+
+.loader-outer:before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border-radius: 50%;
+  border: 3px dotted #1d5ca9;
+  animation: spin 18s linear infinite;
+}
+
+.loader-outer:after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  right: 25px;
+  bottom: 25px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-color: #429bc0;
+  border-width: 5px;
+  border-style: dotted solid;
+  animation: spin 60s linear infinite;
+}
+
+.loader-inner {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  margin: -175px 0 0 -175px;
+  border-radius: 50%;
+}
+
+.loader-inner:before {
+  content: "";
+  position: absolute;
+  top: 70px;
+  left: 70px;
+  right: 70px;
+  bottom: 70px;
+  border-radius: 50%;
+  border: 3px dotted #4398ba;
+  animation: spin 18s linear infinite;
+}
+
+.loader-inner:after {
+  content: "";
+  position: absolute;
+  top: 55px;
+  left: 55px;
+  right: 55px;
+  bottom: 55px;
+  border-radius: 50%;
+  border-color: #59c1eb;
+  border-width: 5px;
+  border-style: double dashed solid dotted;
+  box-shadow: 0 0 40px #2187e7;
+  animation: spin 60s linear infinite;
+}
+
+/* Small Loader for Results Page */
+.loader-outer-small {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #4db8ff;
+  border-bottom-color: #b3e0ff;
+  border-right-color: #66c2ff;
+  border-left-color: #80ccff;
+  box-shadow: 0 0 15px #2187e7;
+  animation: spin 2s linear infinite;
+}
+
+.loader-outer-small:before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 2px dotted #1d5ca9;
+  animation: spin 1.5s linear infinite;
+}
+
+.loader-outer-small:after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  border-radius: 50%;
+  border: 2px solid #429bc0;
+  border-style: dotted solid;
+  animation: spin 3s linear infinite;
+}
+
+/* Smaller Loader for Home Page */
+.loader-outer-small-home {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  margin: -125px 0 0 -125px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #4db8ff;
+  border-bottom-color: #b3e0ff;
+  border-right-color: #66c2ff;
+  border-left-color: #80ccff;
+  box-shadow: 0 0 15px #2187e7;
+  animation: spin 30s linear infinite;
+}
+
+.loader-outer-small-home:before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 50%;
+  border: 2px dotted #1d5ca9;
+  animation: spin 18s linear infinite;
+}
+
+.loader-outer-small-home:after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-color: #429bc0;
+  border-width: 3px;
+  border-style: dotted solid;
+  animation: spin 60s linear infinite;
+}
+
+.loader-inner-small-home {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  margin: -125px 0 0 -125px;
+  border-radius: 50%;
+}
+
+.loader-inner-small-home:before {
+  content: "";
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  border-radius: 50%;
+  border: 2px dotted #4398ba;
+  animation: spin 18s linear infinite;
+}
+
+.loader-inner-small-home:after {
+  content: "";
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  right: 40px;
+  bottom: 40px;
+  border-radius: 50%;
+  border-color: #59c1eb;
+  border-width: 3px;
+  border-style: double dashed solid dotted;
+  box-shadow: 0 0 30px #2187e7;
+  animation: spin 60s linear infinite;
+}
