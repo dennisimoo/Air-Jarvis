@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface FlightData {
@@ -68,7 +68,7 @@ interface WeatherData {
   };
 }
 
-export default function Results() {
+function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const flightNumber = searchParams.get("flight");
@@ -586,5 +586,28 @@ export default function Results() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Results() {
+  return (
+    <Suspense fallback={
+      <div className="relative flex min-h-screen items-center justify-center bg-sky-200 overflow-hidden">
+        <div className="absolute inset-0 opacity-70"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1920&q=80')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/30 to-sky-100/30"></div>
+        <div className="relative z-10 text-center">
+          <div className="loader-outer-small mb-4"></div>
+          <p className="text-blue-950/70 font-medium">Loading results...</p>
+        </div>
+      </div>
+    }>
+      <ResultsContent />
+    </Suspense>
   );
 }
