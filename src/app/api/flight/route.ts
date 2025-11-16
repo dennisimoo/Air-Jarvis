@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Flight number required' }, { status: 400 });
   }
 
-  const apiKey = process.env.AVIATIONSTACK_API_KEY;
+  const apiKey = process.env.AVIATION_API_KEY;
 
   if (!apiKey) {
-    return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    return NextResponse.json({ error: 'Aviation API key not configured' }, { status: 500 });
   }
 
   try {

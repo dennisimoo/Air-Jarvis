@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 import fs from 'fs';
 import path from 'path';
 
@@ -35,9 +36,11 @@ export async function POST(request: NextRequest) {
       console.log('Found existing data for:', name);
       existingData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
       personInfo = existingData.personInfo || '';
-    } else {
-      // Search for person info using YOU API
-      console.log('Searching for new person:', name);
+    }
+
+    // Search for person info if we don't have it yet
+    if (!personInfo || personInfo.length === 0) {
+      console.log('Searching for person info:', name);
 
       try {
         const searchQuery = `${name} pilot aviation`;
@@ -87,6 +90,39 @@ export async function POST(request: NextRequest) {
 
         personInfo = formattedInfo || 'No information found';
         console.log('YOU API search completed, length:', personInfo.length);
+
+        // Use GPT to summarize the search results into a clean bio
+        if (personInfo !== 'No information found') {
+          try {
+            const openaiKey = process.env.OPENAI_API_KEY;
+            if (openaiKey) {
+              const client = new OpenAI({ apiKey: openaiKey });
+              const summaryResponse = await client.chat.completions.create({
+                model: "gpt-5.1-2025-11-13",
+                messages: [
+                  {
+                    role: "system",
+                    content: "You are a biographical researcher. Summarize the search results into a concise 2-3 paragraph professional biography focusing on aviation experience, notable achievements, and relevant background."
+                  },
+                  {
+                    role: "user",
+                    content: `Create a professional biography based on these search results:\n\n${personInfo}`
+                  }
+                ],
+                max_completion_tokens: 300,
+              });
+
+              const summary = summaryResponse.choices[0].message.content || personInfo;
+              personInfo = summary;
+              console.log('\n=== PERSON INFO SUMMARY ===');
+              console.log(personInfo);
+              console.log('===========================\n');
+            }
+          } catch (summaryError) {
+            console.error('Error generating summary:', summaryError);
+            // Keep the raw search results if summary fails
+          }
+        }
       } catch (searchError: any) {
         console.error('YOU API search error:', searchError.message);
         personInfo = `Search unavailable: ${searchError.message}`;

@@ -8,6 +8,7 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [time, setTime] = useState(new Date());
   const [activated, setActivated] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,10 +16,36 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    // Request camera permission when activated
+    if (activated) {
+      requestCameraPermission();
+    }
+  }, [activated]);
+
+  const requestCameraPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      });
+      // Stop the stream immediately after getting permission
+      stream.getTracks().forEach(track => track.stop());
+      setCameraPermission(true);
+      console.log('Camera permission granted');
+    } catch (err) {
+      console.error('Camera permission denied:', err);
+      setCameraPermission(false);
+      alert('Camera access is required for pilot safety analysis. Please allow camera access.');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (flightNumber.trim()) {
+    if (flightNumber.trim() && cameraPermission) {
       router.push(`/questionnaire?flight=${encodeURIComponent(flightNumber)}&name=${encodeURIComponent(userName)}`);
+    } else if (!cameraPermission) {
+      alert('Please allow camera access to proceed.');
     }
   };
 

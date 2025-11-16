@@ -50,11 +50,11 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content: "You are an aviation safety analyst. Analyze the pilot's questionnaire responses, flight data, and weather conditions to assess their readiness to fly. Provide a safety score from 0-100 and a brief 3-sentence explanation."
+          content: "You are an aviation safety analyst. Analyze the pilot's questionnaire responses, flight data, weather conditions, and emotional state (from facial analysis) to assess their readiness to fly. Provide a safety score from 0-100 and a brief 3-sentence explanation."
         },
         {
           role: "user",
-          content: `Analyze this pilot's data and provide a flight readiness score (0-100) and 3-sentence explanation:\n\n${JSON.stringify(pilotData, null, 2)}\n\nConsider: sleep quality, mental state, visibility conditions, planning quality, weather conditions, and overall preparedness. Format your response as JSON with "score" (number) and "explanation" (string) fields.`
+          content: `Analyze this pilot's data and provide a flight readiness score (0-100) and 3-sentence explanation:\n\n${JSON.stringify(pilotData, null, 2)}\n\nConsider: sleep quality, mental state, emotional analysis from facial recognition, stress levels, visibility conditions, planning quality, weather conditions, and overall preparedness. Pay special attention to the emotionAnalysis field which contains AI-analyzed facial expressions and stress levels. Format your response as JSON with "score" (number) and "explanation" (string) fields.`
         }
       ],
       response_format: { type: "json_object" },

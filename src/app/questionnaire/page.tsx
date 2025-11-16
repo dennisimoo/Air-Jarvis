@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const questions = [
@@ -41,11 +41,104 @@ function QuestionnaireContent() {
   const router = useRouter();
   const flightNumber = searchParams.get("flight");
   const userName = searchParams.get("name");
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [saving, setSaving] = useState(false);
+  const [photoCaptured, setPhotoCaptured] = useState(false);
+  const [randomCaptureQuestion, setRandomCaptureQuestion] = useState<number>(-1);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    // Pick a random question to capture photo
+    const randomQ = Math.floor(Math.random() * questions.length);
+    setRandomCaptureQuestion(randomQ);
+    console.log('Will capture photo at question:', randomQ + 1);
+
+    // Start camera preview
+    startCameraPreview();
+
+    return () => {
+      // Cleanup camera stream on unmount
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const startCameraPreview = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setVideoStream(stream);
+
+      // Small delay to ensure ref is ready
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Error starting camera preview:', err);
+    }
+  };
+
+  useEffect(() => {
+    // Capture photo at the random question
+    if (currentQuestion === randomCaptureQuestion && !photoCaptured) {
+      capturePhoto();
+    }
+  }, [currentQuestion, randomCaptureQuestion, photoCaptured]);
+
+  const capturePhoto = async () => {
+    if (!videoRef.current) return;
+
+    try {
+      setIsCapturing(true);
+      console.log('Capturing photo for emotion analysis...');
+
+      // Create canvas and capture frame from preview
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(videoRef.current, 0, 0);
+
+      // Convert to base64
+      const imageData = canvas.toDataURL('image/jpeg', 0.8);
+
+      // Send to API for emotion analysis
+      const response = await fetch('/api/emotion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userName,
+          image: imageData,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Emotion API response:', data);
+      if (data.success) {
+        console.log('Emotion analysis complete:', data.emotion);
+        setPhotoCaptured(true);
+      } else {
+        console.error('Emotion analysis failed:', data.error);
+      }
+
+      // Show notification for 2 seconds
+      setTimeout(() => {
+        setIsCapturing(false);
+      }, 2000);
+    } catch (err) {
+      console.error('Error capturing photo:', err);
+      setIsCapturing(false);
+    }
+  };
 
   const handleNext = () => {
     if (currentAnswer.trim()) {
@@ -133,7 +226,7 @@ function QuestionnaireContent() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-sky-200 overflow-hidden">
       {/* Cloud background */}
-      <div 
+      <div
         className="absolute inset-0 opacity-70"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1920&q=80')",
@@ -141,8 +234,26 @@ function QuestionnaireContent() {
           backgroundPosition: 'center',
         }}
       ></div>
-      
+
       <div className="absolute inset-0 bg-gradient-to-b from-sky-300/30 to-sky-100/30"></div>
+
+      {/* Camera Preview - Top Right */}
+      <div className="absolute top-4 right-4 z-50">
+        <div className="relative">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-48 h-36 rounded-2xl border-2 border-white/40 shadow-2xl object-cover bg-black"
+          />
+          {isCapturing && (
+            <div className="absolute bottom-0 left-0 right-0 bg-red-600/90 backdrop-blur-sm py-2 rounded-b-2xl">
+              <p className="text-white text-xs font-bold text-center animate-pulse">TAKING PHOTO...</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       <main className="relative z-10 flex flex-col items-center justify-center text-center px-8 max-w-2xl w-full">
         {/* Progress indicator */}
